@@ -78,14 +78,14 @@ int main(void)
     {
     }
   }
-  
+
   _Bool Btn_Pressed() {
     return HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15) == GPIO_PIN_RESET;
   }
-  
+
   enum ButtonState Get_Button_State() {
-    uint32_t longThreshold = 600;
-    uint32_t shortThreshold = 250;
+    uint32_t longThreshold = 500;
+    uint32_t shortThreshold = 100;
     if (Btn_Pressed())
       wait(shortThreshold);
     if (!Btn_Pressed())
@@ -93,9 +93,10 @@ int main(void)
     uint32_t start = HAL_GetTick();
     while (HAL_GetTick() - start < (longThreshold - shortThreshold))
       if (!Btn_Pressed()) return SHORT;
+    while (Btn_Pressed()) {}
     return LONG;
   }
-  
+
   void Animation(uint32_t over) {
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
@@ -145,32 +146,33 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	if (cnt / 2 == 0) HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
-	else HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-	if (cnt % 2 == 0) HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-	else HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-	enum ButtonState state = Get_Button_State();
-	switch (state) {
-		case SHORT:
-			cnt++;
-			break;
-		case LONG:
-			cnt--;
-			break;
-		case NONE:
-			break;
-	}
-	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-	if (cnt == 4) {
-		cnt = 0;
-		over++;
-		Animation(over);
-	}
-	if (cnt == -1) {
-		cnt = 3;
-		if (over > 0) over--;
-		Animation(over);
-	}
+		if (cnt / 2 == 0) HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+		else HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+		if (cnt % 2 == 0) HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+		else HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+		enum ButtonState state = Get_Button_State();
+		switch (state) {
+			case SHORT:
+				cnt++;
+				break;
+			case LONG:
+				cnt--;
+				break;
+			case NONE:
+				break;
+		}
+		if (cnt == 4) {
+			cnt = 0;
+			over++;
+			Animation(over);
+		}
+		if (cnt == -1) {
+			cnt = 3;
+			if (over > 0) {
+			 over--;
+			}
+			Animation(over);
+		}
   }
   /* USER CODE END 3 */
 }

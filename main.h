@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include "gpio.h"
 
 enum ButtonState {
 	NONE,
